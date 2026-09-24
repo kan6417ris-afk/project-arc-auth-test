@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>PROJECT ARC - Auth Test</title>
+
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #07111f;
+      color: #ffffff;
+      font-family: Arial, sans-serif;
+    }
+
+    .panel {
+      width: min(92%, 480px);
+      padding: 40px 30px;
+      text-align: center;
+      border: 1px solid #168cff;
+      border-radius: 20px;
+      background: #0b1728;
+    }
+
+    .core {
+      width: 90px;
+      height: 90px;
+      margin: 0 auto 24px;
+      border-radius: 50%;
+      background: #168cff;
+      box-shadow: 0 0 35px #168cff;
+    }
+
+    .eyebrow {
+      color: #58b7ff;
+      font-size: 13px;
+      letter-spacing: 3px;
+      margin-bottom: 10px;
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: 30px;
+    }
+
+    .description {
+      color: #a8b5c7;
+      line-height: 1.7;
+      margin-bottom: 28px;
+    }
+
+    #google-button {
+      display: flex;
+      justify-content: center;
+    }
+
+    #result {
+      display: none;
+      margin-top: 25px;
+      padding: 18px;
+      border-radius: 12px;
+      background: #10243b;
+      line-height: 1.7;
+    }
+
+    .success {
+      color: #72ffb0;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+
+  <main class="panel">
+    <div class="core"></div>
+
+    <div class="eyebrow">PROJECT ARC · AUTH TEST</div>
+
+    <h1>ARC SYSTEM</h1>
+
+    <p class="description">
+      Google Identity Services の<br>
+      認証テスト専用ページです。
+    </p>
+
+    <div id="google-button"></div>
+
+    <div id="result">
+      <div class="success">✓ GOOGLE AUTH SUCCESS</div>
+      <div>GoogleからIDトークンを受信しました。</div>
+      <div>PROJECT ARC STEP 1 認証テスト成功です。</div>
+    </div>
+  </main>
+
+  <script>
+    const GOOGLE_CLIENT_ID =
+      "55474551167-7ias6igt2gds2f7v99bh9iuo5nhbh8lo.apps.googleusercontent.com";
+
+    function handleCredentialResponse(response) {
+      if (!response || !response.credential) {
+        console.error("Google credential was not received.");
+        return;
+      }
+
+      console.log("Google ID token received.");
+
+      document.getElementById("google-button").style.display = "none";
+      document.getElementById("result").style.display = "block";
+    }
+
+    window.onload = function () {
+      google.accounts.id.initialize({
+        client_id: GOOGLE_CLIENT_ID,
+        callback: handleCredentialResponse,
+        auto_select: false,
+        cancel_on_tap_outside: false
+      });
+
+      google.accounts.id.renderButton(
+        document.getElementById("google-button"),
+        {
+          theme: "outline",
+          size: "large",
+          shape: "pill",
+          text: "signin_with",
+          width: 280
+        }
+      );
+    };
+  </script>
+
+</body>
+</html>
