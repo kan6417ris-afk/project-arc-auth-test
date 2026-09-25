@@ -78,6 +78,11 @@
       color: #72ffb0;
       font-weight: bold;
     }
+
+    .error {
+      color: #ff8b8b;
+      font-weight: bold;
+    }
   </style>
 </head>
 
@@ -86,41 +91,92 @@
   <main class="panel">
     <div class="core"></div>
 
-    <div class="eyebrow">PROJECT ARC · AUTH TEST</div>
+    <div class="eyebrow">PROJECT ARC · SERVER AUTH TEST</div>
 
     <h1>ARC SYSTEM</h1>
 
     <p class="description">
-      Google Identity Services の<br>
-      認証テスト専用ページです。
+      Google認証＋ARCサーバー認証の<br>
+      テスト専用ページです。
     </p>
 
     <div id="google-button"></div>
 
-    <div id="result">
-      <div class="success">✓ GOOGLE AUTH SUCCESS</div>
-      <div>GoogleからIDトークンを受信しました。</div>
-      <div>PROJECT ARC STEP 1 認証テスト成功です。</div>
-    </div>
+    <div id="result"></div>
   </main>
 
   <script>
     const GOOGLE_CLIENT_ID =
       "55474551167-7ias6igt2gds2f7v99bh9iuo5nhbh8lo.apps.googleusercontent.com";
 
-    function handleCredentialResponse(response) {
+    const ARC_AUTH_TEST_URL =
+      "https://script.google.com/macros/s/AKfycbwzp9ELJbYXsIAASoXmDZKt7UrFi988zAfChWMB5fpNpiYBmEf8U-lY2NoyDDLYeaH6cQ/exec";
+
+
+    function showResult(success, message) {
+      const result = document.getElementById("result");
+
+      result.style.display = "block";
+
+      result.innerHTML = success
+        ? '<div class="success">✓ ARC SERVER AUTH SUCCESS</div><div>' +
+          message +
+          '</div>'
+        : '<div class="error">✕ ARC SERVER AUTH FAILED</div><div>' +
+          message +
+          '</div>';
+    }
+
+
+    async function handleCredentialResponse(response) {
+
       if (!response || !response.credential) {
-        console.error("Google credential was not received.");
+        showResult(false, "Google IDトークンを取得できませんでした。");
         return;
       }
 
-      console.log("Google ID token received.");
-
       document.getElementById("google-button").style.display = "none";
-      document.getElementById("result").style.display = "block";
+
+      try {
+
+        const gasResponse = await fetch(ARC_AUTH_TEST_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "text/plain;charset=utf-8"
+          },
+          body: JSON.stringify({
+            idToken: response.credential
+          })
+        });
+
+        const result = await gasResponse.json();
+
+        if (result.ok === true) {
+          showResult(
+            true,
+            "Google IDトークンをARCサーバー側でも検証できました。"
+          );
+        } else {
+          showResult(
+            false,
+            "認証結果: " + (result.reason || "UNKNOWN_ERROR")
+          );
+        }
+
+      } catch (error) {
+
+        console.error(error);
+
+        showResult(
+          false,
+          "ARC認証サーバーとの通信に失敗しました。"
+        );
+      }
     }
 
+
     window.onload = function () {
+
       google.accounts.id.initialize({
         client_id: GOOGLE_CLIENT_ID,
         callback: handleCredentialResponse,
