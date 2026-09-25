@@ -3,199 +3,1064 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <title>PROJECT ARC - Auth Test</title>
-
+  <meta name="theme-color" content="#020812">
+  <title>AI司令部 | COMMAND CENTER</title>
   <script src="https://accounts.google.com/gsi/client" async defer></script>
 
   <style>
+    :root {
+      --bg: #020812;
+      --panel: rgba(4, 24, 39, 0.82);
+      --panel2: rgba(2, 14, 25, 0.94);
+      --blue: #32c8ff;
+      --blue2: #168bff;
+      --text: #eaf8ff;
+      --muted: #7aaac0;
+      --green: #51f7bd;
+      --border: rgba(50, 200, 255, 0.42);
+    }
+
     * {
       box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
     }
 
     body {
       margin: 0;
       min-height: 100vh;
+      font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        "Hiragino Sans",
+        "Yu Gothic",
+        sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 50% -10%, #0c4e75 0%, #061c2c 25%, #020812 65%),
+        #020812;
+      overflow-x: hidden;
+    }
+
+    /* 背景グリッド */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.12;
+      background-image:
+        linear-gradient(rgba(51, 199, 255, 0.25) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(51, 199, 255, 0.25) 1px, transparent 1px);
+      background-size: 50px 50px;
+      animation: gridMove 16s linear infinite;
+    }
+
+    @keyframes gridMove {
+      from {
+        transform: translateY(0);
+      }
+      to {
+        transform: translateY(50px);
+      }
+    }
+
+    .shell {
+      width: min(1500px, calc(100% - 28px));
+      margin: 14px auto;
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      background: rgba(0, 8, 17, 0.72);
+      box-shadow:
+        0 0 50px rgba(0, 153, 255, 0.13),
+        inset 0 0 60px rgba(0, 153, 255, 0.04);
+      overflow: hidden;
+      backdrop-filter: blur(12px);
+      position: relative;
+    }
+
+    .topbar {
+      min-height: 74px;
+      padding: 14px 22px;
       display: flex;
       align-items: center;
-      justify-content: center;
-      background: #07111f;
-      color: #ffffff;
-      font-family: Arial, sans-serif;
+      justify-content: space-between;
+      gap: 20px;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(
+        90deg,
+        rgba(0, 29, 48, 0.94),
+        rgba(2, 11, 21, 0.9)
+      );
     }
 
-    .panel {
-      width: min(92%, 480px);
-      padding: 40px 30px;
-      text-align: center;
-      border: 1px solid #168cff;
-      border-radius: 20px;
-      background: #0b1728;
-    }
-
-    .core {
-      width: 90px;
-      height: 90px;
-      margin: 0 auto 24px;
-      border-radius: 50%;
-      background: #168cff;
-      box-shadow: 0 0 35px #168cff;
-    }
-
-    .eyebrow {
-      color: #58b7ff;
-      font-size: 13px;
-      letter-spacing: 3px;
-      margin-bottom: 10px;
-    }
-
-    h1 {
-      margin: 0 0 10px;
-      font-size: 30px;
-    }
-
-    .description {
-      color: #a8b5c7;
-      line-height: 1.7;
-      margin-bottom: 28px;
-    }
-
-    #google-button {
+    .brand {
       display: flex;
-      justify-content: center;
+      align-items: center;
+      gap: 14px;
     }
 
-    #result {
-      display: none;
-      margin-top: 25px;
-      padding: 18px;
+    .brand-core {
+      width: 44px;
+      height: 44px;
+      border: 2px solid var(--blue);
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      box-shadow:
+        0 0 20px rgba(50, 200, 255, 0.75),
+        inset 0 0 16px rgba(50, 200, 255, 0.22);
+      position: relative;
+    }
+
+    .brand-core::before {
+      content: "";
+      width: 12px;
+      height: 12px;
+      background: var(--blue);
+      border-radius: 50%;
+      box-shadow: 0 0 14px var(--blue);
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: clamp(22px, 4vw, 32px);
+      letter-spacing: 0.08em;
+    }
+
+    .brand small {
+      display: block;
+      color: var(--blue);
+      letter-spacing: 0.18em;
+      font-size: 10px;
+      margin-top: 3px;
+    }
+
+    .clock-box {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
+    #date {
+      color: var(--muted);
+      font-size: 12px;
+      letter-spacing: 0.08em;
+    }
+
+    #clock {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--blue);
+      text-shadow: 0 0 16px rgba(50, 200, 255, 0.7);
+    }
+
+    .content {
+      display: grid;
+      grid-template-columns: 230px minmax(0, 1fr);
+      min-height: 760px;
+    }
+
+    .sidebar {
+      padding: 20px 14px;
+      border-right: 1px solid var(--border);
+      background: rgba(2, 15, 27, 0.8);
+    }
+
+    .nav-title {
+      color: var(--muted);
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      margin: 5px 10px 14px;
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 13px 14px;
+      margin-bottom: 7px;
+      border: 1px solid transparent;
       border-radius: 12px;
-      background: #10243b;
-      line-height: 1.7;
+      color: #c7e8f7;
+      text-decoration: none;
+      transition: 0.2s ease;
     }
 
-    .success {
-      color: #72ffb0;
-      font-weight: bold;
+    .nav-link:hover,
+    .nav-link.active {
+      color: white;
+      border-color: var(--border);
+      background: rgba(35, 162, 229, 0.11);
+      box-shadow: 0 0 18px rgba(50, 200, 255, 0.12);
+      transform: translateX(3px);
     }
 
-    .error {
-      color: #ff8b8b;
-      font-weight: bold;
+    .nav-icon {
+      width: 25px;
+      text-align: center;
+      font-size: 20px;
     }
+
+    .side-status {
+      margin-top: 24px;
+      padding: 15px;
+      border: 1px solid rgba(81, 247, 189, 0.3);
+      border-radius: 14px;
+      background: rgba(4, 38, 35, 0.3);
+      font-size: 12px;
+      line-height: 1.6;
+      color: #a9d7cf;
+    }
+
+    .online-dot {
+      display: inline-block;
+      width: 9px;
+      height: 9px;
+      margin-right: 7px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 14px var(--green);
+      animation: pulse 1.7s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%,
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+      50% {
+        opacity: 0.45;
+        transform: scale(0.75);
+      }
+    }
+
+    .main {
+      padding: 24px;
+    }
+
+    .hero {
+      min-height: 310px;
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      overflow: hidden;
+      display: grid;
+      grid-template-columns: 1.15fr 0.8fr 1fr;
+      background:
+        radial-gradient(circle at 70% 50%, rgba(0, 169, 255, 0.15), transparent 36%),
+        linear-gradient(135deg, rgba(4, 35, 57, 0.92), rgba(1, 12, 22, 0.96));
+      box-shadow:
+        inset 0 0 45px rgba(0, 174, 255, 0.05),
+        0 0 30px rgba(0, 174, 255, 0.08);
+    }
+
+    .hero-briefing {
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 26px;
+}
+
+.hero-status {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+    
+    .eyebrow {
+      color: var(--blue);
+      letter-spacing: 0.18em;
+      font-size: 11px;
+      margin-bottom: 14px;
+    }
+
+    .hero h2 {
+      margin: 0;
+      font-size: clamp(30px, 5vw, 56px);
+      line-height: 1.18;
+      letter-spacing: 0.02em;
+    }
+
+    .hero p {
+      color: #9bc8dc;
+      line-height: 1.8;
+      margin: 18px 0 0;
+    }
+
+    .ai-visual {
+      position: relative;
+      min-height: 300px;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+    }
+
+    .orb-ring {
+      position: absolute;
+      border: 1px solid rgba(50, 200, 255, 0.32);
+      border-radius: 50%;
+      animation: rotate 12s linear infinite;
+    }
+
+    .ring1 {
+      width: 250px;
+      height: 250px;
+    }
+
+    .ring2 {
+      width: 195px;
+      height: 195px;
+      animation-direction: reverse;
+      animation-duration: 8s;
+    }
+
+    .ring3 {
+      width: 140px;
+      height: 140px;
+      animation-duration: 5s;
+    }
+
+    .ring1::after,
+    .ring2::after,
+    .ring3::after {
+      content: "";
+      position: absolute;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      top: 50%;
+      left: -5px;
+      background: var(--blue);
+      box-shadow: 0 0 15px var(--blue);
+    }
+
+    @keyframes rotate {
+      from {
+        transform: rotate(0);
+      }
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .ai-core {
+      width: 105px;
+      height: 105px;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 35% 35%, #d6f8ff, #38cfff 13%, #0784d8 40%, #002341 74%);
+      box-shadow:
+        0 0 25px #0caeff,
+        0 0 80px rgba(0, 174, 255, 0.55);
+      z-index: 2;
+      position: relative;
+      animation: float 3.4s ease-in-out infinite;
+    }
+
+    .ai-core::after {
+      content: "";
+      position: absolute;
+      inset: 24%;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.65);
+      box-shadow: inset 0 0 18px rgba(255,255,255,.2);
+    }
+
+    @keyframes float {
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-10px);
+      }
+    }
+
+   .core-label {
+  position: absolute;
+  bottom: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  white-space: nowrap;
+  z-index: 4;
+  color: var(--blue);
+  letter-spacing: 0.16em;
+  font-size: 11px;
+}
+    .core-label span {
+  display: inline-block;
+  margin-top: 6px;
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  opacity: 0.7;
+}
+
+    .section-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin: 28px 2px 14px;
+    }
+
+    .section-head h3 {
+      margin: 0;
+      font-size: 18px;
+      letter-spacing: 0.06em;
+    }
+
+    .section-head span {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+    .hero-status .cards {
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
+.hero-status .card {
+  min-height: 0;
+ padding: 6px 12px;
+}
+    .hero-status .card-icon {
+  font-size: 20px;
+  margin-bottom: 4px;
+}
+    .hero-status .card strong {
+  font-size: 15px;
+}
+
+.hero-status .card p {
+  margin: 4px 0 0;
+  font-size: 14px;
+}
+    .briefing-block,
+.mission-block {
+  padding: 18px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: rgba(4, 24, 39, 0.55);
+}
+    .card {
+      position: relative;
+      display: block;
+      text-decoration: none;
+      color: white;
+      padding: 24px;
+      min-height: 175px;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background:
+        linear-gradient(145deg, rgba(6, 41, 65, 0.9), rgba(1, 14, 25, 0.95));
+      box-shadow: inset 0 0 25px rgba(0, 174, 255, 0.04);
+      transition: 0.22s ease;
+      overflow: hidden;
+    }
+
+    .card::after {
+      content: "";
+      position: absolute;
+      width: 110px;
+      height: 110px;
+      right: -45px;
+      top: -45px;
+      border-radius: 50%;
+      background: rgba(50, 200, 255, 0.06);
+      box-shadow: 0 0 35px rgba(50, 200, 255, 0.12);
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      border-color: rgba(99, 222, 255, 0.95);
+      box-shadow:
+        0 0 28px rgba(0, 174, 255, 0.18),
+        inset 0 0 25px rgba(0, 174, 255, 0.07);
+    }
+
+    .card-icon {
+      font-size: 32px;
+      margin-bottom: 20px;
+    }
+
+    .card strong {
+      display: block;
+      font-size: 20px;
+      margin-bottom: 8px;
+    }
+
+    .card small {
+      color: #87b7cc;
+      line-height: 1.5;
+    }
+
+    .arrow {
+      position: absolute;
+      bottom: 18px;
+      right: 20px;
+      color: var(--blue);
+    }
+
+    .bottom-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 16px;
+    }
+
+    .info-panel {
+      padding: 20px;
+      border-radius: 18px;
+      border: 1px solid rgba(50, 200, 255, 0.28);
+      background: rgba(2, 20, 34, 0.78);
+    }
+
+    .info-panel h4 {
+      margin: 0 0 14px;
+      color: #dff7ff;
+      font-size: 15px;
+    }
+
+    .mission {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #a9cddb;
+      padding: 7px 0;
+      font-size: 13px;
+    }
+
+    .check {
+      width: 19px;
+      height: 19px;
+      border: 1px solid rgba(50, 200, 255, 0.65);
+      border-radius: 5px;
+      display: grid;
+      place-items: center;
+      color: var(--blue);
+      font-size: 11px;
+      flex: 0 0 auto;
+    }
+
+    .future-message {
+      color: #8ab9ca;
+      line-height: 1.8;
+      font-size: 13px;
+    }
+
+    .footer {
+      padding: 18px;
+      text-align: center;
+      color: #376b83;
+      font-size: 10px;
+      letter-spacing: 0.24em;
+      border-top: 1px solid rgba(50, 200, 255, 0.13);
+    }
+
+    @media (max-width: 900px) {
+      .content {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        display: none;
+      }
+
+      .hero {
+        grid-template-columns: 1fr;
+      }
+　　　.hero-briefing,
+.hero-status {
+  padding: 20px;
+}
+      .ai-visual {
+        min-height: 250px;
+      }
+
+      .cards {
+        grid-template-columns: 1fr;
+      }
+
+      .bottom-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .main {
+        padding: 15px;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .shell {
+        width: calc(100% - 12px);
+        margin: 6px auto;
+        border-radius: 18px;
+      }
+
+      .topbar {
+        padding: 12px 14px;
+      }
+
+      .brand h1 {
+        font-size: 20px;
+      }
+
+      .brand small {
+        font-size: 8px;
+      }
+
+      #clock {
+        font-size: 20px;
+      }
+
+      #date {
+        font-size: 9px;
+      }
+
+      .hero-copy {
+        padding: 27px 22px;
+      }
+
+      .hero p {
+        font-size: 14px;
+      }
+
+      .orb-ring.ring1 {
+        width: 200px;
+        height: 200px;
+      }
+
+      .orb-ring.ring2 {
+        width: 150px;
+        height: 150px;
+      }
+
+      .orb-ring.ring3 {
+        width: 105px;
+        height: 105px;
+      }
+
+      .ai-core {
+        width: 80px;
+        height: 80px;
+      }
+    }
+
+    /* PROJECT ARC SECURE — Google sign-in gate */
+    #arc-app[hidden] { display: none !important; }
+    .auth-gate {
+      min-height: 100vh; display: grid; place-items: center; padding: 24px;
+      background: radial-gradient(circle at 50% 20%, #0c4e75 0%, #061c2c 28%, #020812 68%);
+    }
+    .auth-panel {
+      width: min(520px, 100%); padding: 34px; text-align: center;
+      border: 1px solid var(--border); border-radius: 22px;
+      background: rgba(0, 8, 17, .88); box-shadow: 0 0 50px rgba(0,153,255,.16);
+    }
+    .auth-orb {
+      width: 82px; height: 82px; margin: 0 auto 20px; border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #d6f8ff, #38cfff 13%, #0784d8 40%, #002341 74%);
+      box-shadow: 0 0 25px #0caeff, 0 0 70px rgba(0,174,255,.5);
+    }
+    .auth-panel h2 { margin: 0; letter-spacing: .12em; }
+    .auth-panel p { color: var(--muted); line-height: 1.7; }
+    #google-signin { display: flex; justify-content: center; margin-top: 24px; }
+    #auth-error { min-height: 1.5em; margin-top: 16px; color: #ff9d9d; font-size: 13px; }
   </style>
 </head>
 
 <body>
+  <section id="auth-gate" class="auth-gate">
+    <div class="auth-panel">
+      <div class="auth-orb"></div>
+      <div class="eyebrow">PROJECT ARC · SECURE ACCESS</div>
+      <h2>ARC SYSTEM</h2>
+      <p>Googleアカウントで認証してください。<br>許可されたテストユーザーのみログインできます。</p>
+      <div id="google-signin"></div>
+      <div id="auth-error"></div>
+    </div>
+  </section>
 
-  <main class="panel">
-    <div class="core"></div>
+  <div id="arc-app" hidden>
 
-    <div class="eyebrow">PROJECT ARC · SERVER AUTH TEST</div>
+  <div class="shell">
 
-    <h1>ARC SYSTEM</h1>
+    <header class="topbar">
 
-    <p class="description">
-      Google認証＋ARCサーバー認証の<br>
-      テスト専用ページです。
-    </p>
+      <div class="brand">
+        <div class="brand-core"></div>
 
-    <div id="google-button"></div>
+        <div>
+          <h1>AI司令部</h1>
+          <small>PERSONAL AI COMMAND CENTER</small>
+        </div>
+      </div>
 
-    <div id="result"></div>
-  </main>
+      <div class="clock-box">
+        <div id="date">----.--.--</div>
+        <div id="clock">--:--:--</div>
+      </div>
 
-  <script>
-    const GOOGLE_CLIENT_ID =
-      "55474551167-7ias6igt2gds2f7v99bh9iuo5nhbh8lo.apps.googleusercontent.com";
-
-    const ARC_AUTH_TEST_URL =
-      "https://script.google.com/macros/s/AKfycbwzp9ELJbYXsIAASoXmDZKt7UrFi988zAfChWMB5fpNpiYBmEf8U-lY2NoyDDLYeaH6cQ/exec";
+    </header>
 
 
-    function showResult(success, message) {
-      const result = document.getElementById("result");
+    <div class="content">
 
-      result.style.display = "block";
+      <aside class="sidebar">
 
-      result.innerHTML = success
-        ? '<div class="success">✓ ARC SERVER AUTH SUCCESS</div><div>' +
-          message +
-          '</div>'
-        : '<div class="error">✕ ARC SERVER AUTH FAILED</div><div>' +
-          message +
-          '</div>';
+        <div class="nav-title">COMMAND MENU</div>
+
+        <a class="nav-link active" href="#">
+          <span class="nav-icon">⌂</span>
+          ホーム
+        </a>
+
+        <a class="nav-link"
+           href="https://chatgpt.com/g/g-p-6a9ccdbe2ef08191bce632d235f3996b-aisi-ling-bu/c/6a9ccdc3-dcd8-83ee-afda-748f1bfbbcbb"
+           target="_blank">
+          <span class="nav-icon">🤖</span>
+          AI司令部
+        </a>
+
+        <a class="nav-link"
+           href="https://kan6417ris-afk.github.io/-/"
+           target="_blank">
+          <span class="nav-icon">🏠</span>
+          家計管理部
+        </a>
+                <a class="nav-link"
+           href="https://chatgpt.com/g/g-p-6a9a4b1de1748191aa6ee233da95b7af-jia-ji-xiang-tan-shi/c/6a9a4b1f-5a14-83e9-8d1b-451a75ae96c3"
+           target="_blank">
+          <span class="nav-icon">💬</span>
+          家計相談室
+        </a>
+
+        <a class="nav-link"
+           href="https://docs.google.com/spreadsheets/d/1T7EmhOaq0zO5VCE5UoJAHYjg3LbC9vf74RZZKuGE8do/edit?gid=2129054345#gid=2129054345"
+           target="_blank">
+          <span class="nav-icon">📈</span>
+          資産管理室
+        </a>
+
+                <a class="nav-link"
+           href="https://chatgpt.com/g/g-p-6a9a153773548191a081e787a8e8fe07-notebian-ji-bu/c/6a9a1556-0884-83e8-b22c-96381c0c76b0"
+           target="_blank">
+          <span class="nav-icon">📝</span>
+          NOTE編集部
+        </a>
+
+        <div class="side-status">
+          <span class="online-dot"></span>
+          SYSTEM ONLINE
+          <br><br>
+          AI司令部 Ver.2
+          <br>
+          All systems operational.
+        </div>
+
+      </aside>
+
+
+      <main class="main">
+
+        <section class="hero">
+
+          <div class="hero-briefing">
+
+        <div class="briefing-block">
+  <div class="eyebrow">🤖 ARC BRIEFING</div>
+  <p id="baymax-briefing">
+    司令部のデータを分析中...
+  </p>
+</div>
+
+<div class="mission-block">
+  <div class="eyebrow">🎯 TODAY'S MISSION</div>
+  <strong id="today-mission">
+    今日のミッションを分析中...
+  </strong>
+</div>
+
+          </div>
+
+
+          <div class="ai-visual">
+
+            <div class="orb-ring ring1"></div>
+            <div class="orb-ring ring2"></div>
+            <div class="orb-ring ring3"></div>
+
+            <div class="ai-core"></div>
+
+            <div class="core-label">
+  ARC CORE<br>
+  <span>CENTRAL AI — ONLINE</span>
+</div>
+
+         </div>
+
+<div class="hero-status">
+<div class="section-head">
+  <h3>COMMAND STATUS</h3>
+  <span>現在の状況</span>
+</div>
+
+<section class="cards">
+  <div class="card">
+    <div class="card-icon">💰</div>
+    <strong>今月支出</strong>
+    <p id="monthly-spend">読み込み中...</p>
+  </div>
+
+  <div class="card">
+    <div class="card-icon">💎</div>
+    <strong>総資産</strong>
+    <p id="total-assets">読み込み中...</p>
+  </div>
+
+  <div class="card">
+    <div class="card-icon">🔥</div>
+    <strong>FIRE進捗</strong>
+    <p id="fire-rate">読み込み中...</p>
+  </div>
+
+  <div class="card">
+    <div class="card-icon">📝</div>
+    <strong>NOTE記事数</strong>
+    <p id="note-count">読み込み中...</p>
+  </div>
+
+  <div class="card">
+    <div class="card-icon">💼</div>
+    <strong>副業収益</strong>
+    <p id="side-income">読み込み中...</p>
+  </div>
+</section>
+  
+</div>
+
+</section>
+
+        <div class="section-head">
+          <h3>COMMAND MODULES</h3>
+          <span>主要システム</span>
+        </div>
+
+
+        <section class="cards">
+
+          <a class="card"
+             href="https://docs.google.com/spreadsheets/d/1T7EmhOaq0zO5VCE5UoJAHYjg3LbC9vf74RZZKuGE8do/edit?gid=2129054345#gid=2129054345"
+             target="_blank">
+
+            <div class="card-icon">🤖</div>
+
+            <strong>AI司令部</strong>
+
+            <small>
+              家計・配当・AI活用の状況を確認
+            </small>
+
+            <span class="arrow">→</span>
+
+          </a>
+
+
+          <a class="card"
+             href="https://kan6417ris-afk.github.io/-/"
+             target="_blank">
+
+            <div class="card-icon">🏠</div>
+
+            <strong>家計管理部</strong>
+
+            <small>
+              毎日の支出入力と今月の家計を管理
+            </small>
+
+            <span class="arrow">→</span>
+
+          </a>
+
+
+          <a class="card"
+             href="https://docs.google.com/spreadsheets/d/1T7EmhOaq0zO5VCE5UoJAHYjg3LbC9vf74RZZKuGE8do/edit?gid=2129054345#gid=2129054345"
+             target="_blank">
+
+            <div class="card-icon">📈</div>
+
+            <strong>資産管理室</strong>
+
+            <small>
+              資産形成・配当・FIREへの進捗を確認
+            </small>
+
+            <span class="arrow">→</span>
+
+          </a>
+
+        </section>
+
+
+        <section class="bottom-grid">
+
+          <div class="info-panel">
+
+            <h4>今日のミッション</h4>
+
+            <div class="mission">
+              <span class="check">✓</span>
+              AI司令部を確認する
+            </div>
+
+            <div class="mission">
+              <span class="check"></span>
+              家計入力を確認する
+            </div>
+
+            <div class="mission">
+              <span class="check"></span>
+              次の一歩を決める
+            </div>
+
+          </div>
+
+
+          <div class="info-panel">
+
+            <h4>MESSAGE FROM AI CORE</h4>
+
+            <div class="future-message">
+              今日できる小さな一歩を積み重ねよう。<br>
+              家族の「やりたい」を、少しずつ形にしていく。<br><br>
+
+              <span style="color:#32c8ff;">
+                SMALL STEPS · BIG FUTURES
+              </span>
+            </div>
+
+          </div>
+
+        </section>
+
+      </main>
+
+    </div>
+
+
+    <footer class="footer">
+      AI COMMAND CENTER · SYSTEM ONLINE · ALWAYS WITH YOU
+    </footer>
+
+  </div>
+  </div><!-- /#arc-app -->
+
+
+
+<script>
+  const GOOGLE_CLIENT_ID = "55474551167-7ias6igt2gds2f7v99bh9iuo5nhbh8lo.apps.googleusercontent.com";
+  const ARC_SECURE_API_URL = "https://script.google.com/macros/s/AKfycbwzp9ELJbYXsIAASoXmDZKt7UrFi988zAfChWMB5fpNpiYBmEf8U-IY2NoyDDLYeaH6cQ/exec";
+
+  function setAuthError(message) {
+    document.getElementById("auth-error").textContent = message || "";
+  }
+
+  async function handleGoogleCredential(response) {
+    if (!response || !response.credential) {
+      setAuthError("Google認証に失敗しました。もう一度お試しください。");
+      return;
     }
 
+    setAuthError("ARCサーバーで認証中...");
 
-    async function handleCredentialResponse(response) {
+    try {
+     const apiResponse = await fetch(ARC_SECURE_API_URL, {
+  method: "POST",
+  headers: {
+    "Content-Type": "text/plain;charset=utf-8"
+  },
+  body: JSON.stringify({
+    idToken: response.credential
+  })
+});
 
-      if (!response || !response.credential) {
-        showResult(false, "Google IDトークンを取得できませんでした。");
-        return;
+      const result = await apiResponse.json();
+      if (!result || result.ok !== true || !result.data) {
+        throw new Error((result && result.error) || "認証されたデータを取得できませんでした。");
       }
 
-      document.getElementById("google-button").style.display = "none";
+      renderCommandStatus(result.data);
+      document.getElementById("auth-gate").hidden = true;
+      document.getElementById("arc-app").hidden = false;
+      setAuthError("");
+    } catch (error) {
+      console.error("ARC SECURE認証エラー:", error);
+      setAuthError("ARCサーバー認証に失敗しました。ログインをやり直してください。");
+    }
+  }
 
-      try {
+  function renderCommandStatus(data) {
+    document.getElementById("monthly-spend").textContent =
+      "¥" + Number(data.monthlySpend || 0).toLocaleString("ja-JP");
+    document.getElementById("total-assets").textContent =
+      "¥" + Number(data.totalAssets || 0).toLocaleString("ja-JP");
+    document.getElementById("fire-rate").textContent =
+      (Number(data.fireRate || 0) * 100).toFixed(1) + "%";
+    document.getElementById("note-count").textContent =
+      Number(data.noteCount || 0).toLocaleString("ja-JP") + "本";
+    document.getElementById("side-income").textContent =
+      "¥" + Number(data.sideIncome || 0).toLocaleString("ja-JP");
+    document.getElementById("today-mission").textContent =
+      data.aiMission || "本日のミッションは未設定です。";
+    document.getElementById("baymax-briefing").textContent =
+      data.aiBriefing || "ARCブリーフィングは未設定です。";
+  }
 
-        const gasResponse = await fetch(ARC_AUTH_TEST_URL, {
-          method: "POST",
-          headers: {
-            "Content-Type": "text/plain;charset=utf-8"
-          },
-          body: JSON.stringify({
-            idToken: response.credential
-          })
-        });
-
-        const result = await gasResponse.json();
-
-        if (result.ok === true) {
-          showResult(
-            true,
-            "Google IDトークンをARCサーバー側でも検証できました。"
-          );
-        } else {
-          showResult(
-            false,
-            "認証結果: " + (result.reason || "UNKNOWN_ERROR")
-          );
-        }
-
-      } catch (error) {
-
-        console.error(error);
-
-        showResult(
-          false,
-          "ARC認証サーバーとの通信に失敗しました。"
-        );
-      }
+  window.addEventListener("load", () => {
+    if (!window.google || !google.accounts || !google.accounts.id) {
+      setAuthError("Google認証サービスを読み込めませんでした。再読み込みしてください。");
+      return;
     }
 
+    google.accounts.id.initialize({
+      client_id: GOOGLE_CLIENT_ID,
+      callback: handleGoogleCredential,
+      auto_select: false,
+      cancel_on_tap_outside: false
+    });
 
-    window.onload = function () {
+    google.accounts.id.renderButton(
+      document.getElementById("google-signin"),
+      { theme: "outline", size: "large", shape: "pill", text: "signin_with", width: 280 }
+    );
+  });
+</script>
 
-      google.accounts.id.initialize({
-        client_id: GOOGLE_CLIENT_ID,
-        callback: handleCredentialResponse,
-        auto_select: false,
-        cancel_on_tap_outside: false
-      });
-
-      google.accounts.id.renderButton(
-        document.getElementById("google-button"),
-        {
-          theme: "outline",
-          size: "large",
-          shape: "pill",
-          text: "signin_with",
-          width: 280
-        }
-      );
-    };
-  </script>
-
+<script>
+  function updateClock() {
+    const now = new Date();
+    const timeFormatter = new Intl.DateTimeFormat("ja-JP", {
+      timeZone: "Asia/Tokyo", hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false
+    });
+    const dateFormatter = new Intl.DateTimeFormat("ja-JP", {
+      timeZone: "Asia/Tokyo", year: "numeric", month: "2-digit", day: "2-digit", weekday: "short"
+    });
+    document.getElementById("clock").textContent = timeFormatter.format(now);
+    document.getElementById("date").textContent = dateFormatter.format(now);
+  }
+  updateClock();
+  setInterval(updateClock, 1000);
+</script>
+  
 </body>
 </html>
